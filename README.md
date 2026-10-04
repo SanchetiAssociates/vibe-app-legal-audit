@@ -1,6 +1,6 @@
 # vibe-app-legal-audit
 
-A free, open-source pre-launch legal-exposure scanner and Claude skill for web and mobile apps (especially AI-generated "vibe coded" apps). It scans a codebase for nine patterns that create per-user or per-email statutory exposure under **US**, **Indian** and **EU** rules. Then it guides the fixes that code can solve.
+A free, open-source pre-launch legal-exposure scanner and Claude skill for web and mobile apps (especially AI-generated "vibe coded" apps). It scans a codebase for eleven patterns that create per-user or per-email statutory exposure under **US**, **Indian** and **EU** rules. Then it guides the fixes that code can solve.
 
 > **This is a checklist and not legal advice.** Laws differ by state and country. See [DISCLAIMER.md](DISCLAIMER.md).
 
@@ -17,8 +17,12 @@ A free, open-source pre-launch legal-exposure scanner and Claude skill for web a
 | 7 | No privacy notice or data-rights path | DPDP Act and Rules 2025. CCPA/CPRA |
 | 8 | No Grievance Officer for user-content platforms | India IT Rules 2021 |
 | 9 | Dark patterns in the UI | India Dark Patterns Guidelines 2023. FTC Act s.5 |
+| 10 | Accounts with no Terms of Service or no clear acceptance step | Indian Contract Act 1872. IT Act s.10A. US clickwrap case law |
+| 11 | No visible DPDP engineering controls (security safeguards, breach path, retention, consent record, contact) | DPDP Act s.8. Rules 6, 7, 8 and 14 |
 
-Law summaries with confidence markers are in [references/laws-us.md](references/laws-us.md) and [references/laws-india.md](references/laws-india.md). Fix snippets are in [references/fix-templates.md](references/fix-templates.md).
+The scan report ends with an owner-only checklist for items code cannot show (trademark clearance, DMCA agent, processor contracts, GDPR and CCPA applicability).
+
+Law summaries with confidence markers are in [references/laws-us.md](references/laws-us.md) and [references/laws-india.md](references/laws-india.md). A full map of DPDP duties beyond consent and privacy policy (processor contracts, accuracy, security safeguards, breach notification, retention, children, grievance and more) with the Rs 250 crore penalty mapping is in [references/dpdp-obligations.md](references/dpdp-obligations.md). Fix snippets are in [references/fix-templates.md](references/fix-templates.md).
 
 ## Quick start
 

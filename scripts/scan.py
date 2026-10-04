@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """vibe-app-legal-audit scanner.
 
-Static heuristic scan of a code repository for nine common legal-exposure
-patterns in quickly built (vibe coded) web apps. It reads files only. It never
+Static heuristic scan of a code repository for common legal-exposure
+patterns (eleven checks) in quickly built (vibe coded) web apps. It reads files only. It never
 executes project code and never makes network calls.
 
 Usage:
@@ -83,6 +83,15 @@ GRIEVANCE_OFFICER = RX(r"grievance[\s_-]?officer|grievance[\s_-]?redressal")
 PRECHECKED = RX(r"<input[^>]*type\s*=\s*[\"']checkbox[\"'][^>]*\bchecked\b|defaultChecked|checked\s*=\s*\{?\s*true")
 URGENCY = RX(r"countdown|only\s+\d+\s+(left|remaining)|hurry|offer ends in|limited[\s_-]?time|\d+\s+people (are )?(viewing|looking)|almost (gone|sold out)")
 SHAMING = RX(r"no thanks,?\s*i\s*(don'?t|do not|hate|prefer|like|will)|i don'?t want to (save|be)|i'?ll (pay|stay) (full|without)|maybe later,? i")
+
+TERMS_LINK = RX(r"terms[\s_-]?(of[\s_-]?)?(service|use)|/terms\b|user[\s_-]?agreement|terms\s*(and|&)\s*conditions|/tos\b")
+TERMS_ACCEPT = RX(r"(by (signing up|creating|continuing|registering|clicking)|i (agree|accept)|you (agree|accept)).{0,120}(terms|conditions|policy)|(agree|accept).{0,40}terms|accepted_terms|terms_accepted|tos_accepted|agreed_to_terms")
+SEC_ENCRYPT = RX(r"bcrypt|argon2|scrypt|pbkdf2|encrypt|aes-?\d*|createCipher|kms|crypto\.subtle|fernet|libsodium|helmet\(|strict-transport-security")
+SEC_LOGS = RX(r"audit[\s_-]?log|access[\s_-]?log|winston|pino|morgan\(|logger\.|logging\.|structlog|cloudtrail|sentry")
+SEC_BREACH = RX(r"breach|incident[\s_-]?response|security@|vulnerability[\s_-]?disclosure|security\.txt|data[\s_-]?protection[\s_-]?board")
+SEC_RETENTION = RX(r"retention|purge|ttl\b|expires_at|expire_at|delete[\s_-]?after|cron.{0,60}delete|erasure|inactive[\s_-]?(user|account)|anonymi[sz]e")
+CONSENT_LOG = RX(r"consent[\s_-]?(log|record|history|receipt)|consented_at|consent_given|consent_version|notice_version")
+DPO_CONTACT = RX(r"data[\s_-]?protection[\s_-]?officer|\bdpo\b|privacy@|grievance|contact[\s_-]?(us|details).{0,80}privacy")
 
 # ---------------------------------------------------------------- helpers
 
@@ -329,6 +338,52 @@ def scan(root):
         "status": status, "severity": sev, "evidence": dp[:10],
         "notes": "Pre-ticked consent boxes and fake urgency are common triggers. A pre-checked box is acceptable only for non-consent options. Consent and renewal boxes must start unticked.",
     }
+
+    # 10 Terms of service and acceptance --------------------------------
+    terms_link = [hit(p, root, *first_line(t, TERMS_LINK)) for p, t in files.items() if TERMS_LINK.search(t)]
+    terms_accept = bool(TERMS_ACCEPT.search(all_text))
+    if not signup_hits:
+        status, sev = "NOT_APPLICABLE", "INFO"
+    elif not terms_link:
+        status, sev = "FAIL", "MEDIUM"
+    elif not terms_accept:
+        status, sev = "REVIEW", "MEDIUM"
+    else:
+        status, sev = "REVIEW", "LOW"
+    result["10_terms_of_service"] = {
+        "title": "Accounts created with no Terms of Service or no clear acceptance step (Indian Contract Act 1872; IT Act s.10A; US clickwrap case law)",
+        "status": status, "severity": sev, "evidence": terms_link[:5],
+        "notes": f"Terms page or link found: {bool(terms_link)}. Acceptance wording or checkbox found: {terms_accept}. "
+                 "Clickwrap (an I agree action next to a link to the terms with a logged timestamp) is far more enforceable than a footer-only link (browsewrap). "
+                 "Check limitation of liability, governing law, arbitration and notice of changes with a lawyer.",
+    }
+
+    # 11 DPDP engineering controls (security, breach, retention, consent log, contact) --
+    signals = {
+        "encryption or password hashing": bool(SEC_ENCRYPT.search(all_text)),
+        "audit or access logging": bool(SEC_LOGS.search(all_text)),
+        "breach or incident contact or runbook": bool(SEC_BREACH.search(all_text)),
+        "retention or erasure or purge logic": bool(SEC_RETENTION.search(all_text)),
+        "consent record (timestamp or notice version)": bool(CONSENT_LOG.search(all_text)),
+        "DPO or privacy contact or grievance contact": bool(DPO_CONTACT.search(all_text)),
+    }
+    missing = [k for k, v in signals.items() if not v]
+    if not collects:
+        status, sev = "NOT_APPLICABLE", "INFO"
+    elif len(missing) >= 4:
+        status, sev = "FAIL", "MEDIUM"
+    elif missing:
+        status, sev = "REVIEW", "LOW"
+    else:
+        status, sev = "REVIEW", "INFO"
+    result["11_dpdp_engineering_controls"] = {
+        "title": "No visible DPDP engineering controls: security safeguards, breach path, retention, consent record, contact (DPDP Act s.8; Rules 6, 7, 8, 14)",
+        "status": status, "severity": sev,
+        "evidence": [{"tool": k, "file": "-", "line": None, "snippet": ""} for k in missing],
+        "notes": "Missing signals listed as evidence. Present: " + (", ".join(k for k, v in signals.items() if v) or "none") + ". "
+                 "Security safeguards (s.8(5)) carry the highest ceiling of Rs 250 crore. See references/dpdp-obligations.md. "
+                 "A processor contract, breach drill and DPO appointment cannot be seen in code.",
+    }
     return result, len(files)
 
 
@@ -337,11 +392,11 @@ def to_markdown(res, nfiles, root):
     lines = [f"# Legal exposure scan: `{os.path.basename(os.path.abspath(root))}`",
              f"Files scanned: {nfiles}. Heuristic scan only. Not legal advice.", "",
              "| # | Check | Status | Severity |", "|---|---|---|---|"]
-    for k, v in sorted(res.items()):
-        lines.append(f"| {k[0]} | {v['title']} | {v['status']} | {v['severity']} |")
+    for k, v in sorted(res.items(), key=lambda kv: int(kv[0].split('_')[0])):
+        lines.append(f"| {k.split('_')[0]} | {v['title']} | {v['status']} | {v['severity']} |")
     lines.append("")
-    for k, v in sorted(res.items(), key=lambda kv: order[kv[1]["severity"]]):
-        lines.append(f"## {k[0]}. {v['title']}  [{v['status']} / {v['severity']}]")
+    for k, v in sorted(res.items(), key=lambda kv: (order[kv[1]["severity"]], int(kv[0].split('_')[0]))):
+        lines.append(f"## {k.split('_')[0]}. {v['title']}  [{v['status']} / {v['severity']}]")
         if v["notes"]:
             lines.append(v["notes"])
         for e in v["evidence"]:
@@ -349,6 +404,13 @@ def to_markdown(res, nfiles, root):
             tool = f"**{e['tool']}** " if e.get("tool") else ""
             lines.append(f"- {tool}`{loc}` {('`' + e['snippet'] + '`') if e.get('snippet') else ''}")
         lines.append("")
+    lines += ["## Owner-only checks (cannot be detected in code)",
+              "- Trademark clearance of the app name: IP India public search (Classes 9 and 35 and 42) and USPTO search before launch. Unregistered use can also create rights.",
+              "- DMCA designated agent registered at dmca.copyright.gov if users upload content.",
+              "- DPDP: signed processor contracts, breach runbook and drill, DPO or contact appointed, retention schedule approved.",
+              "- GDPR applies to non-EU apps that offer services to or monitor people in the EU (Art. 3(2)). Check whether an EU representative is needed (Art. 27).",
+              "- CCPA applies at USD 26,625,000 revenue or 100,000 California consumers or 50 percent revenue from selling or sharing data (check the current inflation-adjusted figure).",
+              "- Have a lawyer or chartered accountant review the final policy and terms.", ""]
     return "\n".join(lines)
 
 

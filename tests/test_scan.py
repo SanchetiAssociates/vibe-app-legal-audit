@@ -27,6 +27,8 @@ class ScanTests(unittest.TestCase):
                     "4_email_can_spam", "5_auto_renewal_disclosure", "6_dmca_safe_harbor"):
             self.assertEqual(res[key]["status"], "FAIL", key)
         self.assertEqual(res["9_dark_patterns"]["status"], "REVIEW")
+        self.assertEqual(res["10_terms_of_service"]["status"], "FAIL")
+        self.assertEqual(res["11_dpdp_engineering_controls"]["status"], "FAIL")
 
     def test_good_fixture_has_no_high(self):
         code, res = run(os.path.join(FIX, "good"))
@@ -34,6 +36,18 @@ class ScanTests(unittest.TestCase):
         self.assertEqual(res["2_google_fonts_ip_leak"]["status"], "PASS")
         self.assertEqual(res["3_session_replay_wiretap"]["status"], "PASS")
         self.assertEqual(res["9_dark_patterns"]["status"], "PASS")
+        self.assertEqual(res["10_terms_of_service"]["status"], "REVIEW")
+        self.assertEqual(res["10_terms_of_service"]["severity"], "LOW")
+
+    def test_report_orders_checks_numerically(self):
+        with tempfile.TemporaryDirectory() as d:
+            md = os.path.join(d, "out.md")
+            subprocess.run([sys.executable, SCAN, os.path.join(FIX, "bad"), "--md", md], capture_output=True, text=True)
+            with open(md) as f:
+                text = f.read()
+        rows = [l for l in text.splitlines() if l.startswith("| ") and l[2:3].isdigit()]
+        nums = [int(l.split("|")[1]) for l in rows]
+        self.assertEqual(nums, list(range(1, 12)))
 
     def test_missing_dir_exits_2(self):
         proc = subprocess.run([sys.executable, SCAN, "/no/such/dir"], capture_output=True, text=True)
