@@ -92,3 +92,47 @@ Also provide: an online cancel button, a confirmation email that restates the te
 - Link to this page from the footer and from every upload form
 
 Register the same agent details at https://dmca.copyright.gov ($6 per designation. Renew every three years).
+
+## 7. Clickwrap acceptance with a log
+
+```html
+<label><input type="checkbox" name="terms" required>
+  I agree to the <a href="/terms">Terms of Service</a> and the <a href="/privacy">Privacy Policy</a>.</label>
+```
+
+```js
+// server: store proof of assent
+await db.consents.insert({
+  user_id, purpose: 'terms_and_privacy', granted: true,
+  notice_version: '2026-10-01', consented_at: new Date().toISOString(), ip_hash
+});
+```
+
+## 8. DPDP consent record and withdrawal
+
+- One row per purpose with notice version and timestamp. Never pre-tick the box.
+- Withdrawal must be as easy as giving consent. Add a settings toggle that writes granted=false and stops the related processing.
+
+## 9. Breach response skeleton (DPDP Rule 7)
+
+1. Contain and record the facts (nature and extent and time and location).
+2. Tell each affected person without delay in plain language (what happened and likely consequences and what you did and what they can do and your contact).
+3. Tell the Data Protection Board without delay.
+4. File the detailed report with the Board within 72 hours (causes and findings and measures and a summary of the person notices).
+5. Keep logs for at least one year (Rule 6 and Rule 8(3)).
+
+## 10. Retention and erasure job (DPDP Rule 8)
+
+```js
+// nightly: warn 48 hours before purge then delete
+const cutoff = daysAgo(RETENTION_DAYS);
+const warn = await users.inactiveSince(daysAgo(RETENTION_DAYS - 2));
+for (const u of warn) await sendErasureNotice(u);   // at least 48 hours notice
+await users.purgeInactiveBefore(cutoff, { keepLogsForDays: 365 }); // keep processing logs 1 year
+```
+
+Cascade the deletion to processors and backups on your schedule.
+
+## 11. Contact and grievance block
+
+[DPO or privacy contact name] · [email] · [postal address]. Grievance response time: not more than [N] days (maximum 90). Link to the complaint form and to the Data Protection Board complaint route.

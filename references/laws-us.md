@@ -1,4 +1,4 @@
-# United States law map for the audit (position as at 2 Oct 2026)
+# United States law map for the audit (position as at 4 Oct 2026)
 
 Confidence key: **V** = read from a fetched source this session. **K** = established statute known to the author but not re-fetched. Verify every **K** line before quoting it to a client. Penalty figures are statutory maxima and not typical outcomes.
 
@@ -62,7 +62,30 @@ Defence trend: a California federal court held that data which becomes intelligi
 | Statutory damages | $750 to $30,000 per work. Up to $150,000 if willful (17 U.S.C. 504(c)) | V |
 | Registration limit | Statutory damages generally need timely registration of the work (17 U.S.C. 411 and 412) | K |
 
-## 7. Official portals
+## 7. Applicability: GDPR and CCPA (owner check)
+
+| Item | Position | Conf. |
+|---|---|---|
+| GDPR reach | Article 3(2) applies to non-EU controllers that offer goods or services to people in the Union (payment not needed) or monitor their behaviour in the Union | V |
+| GDPR representative and fines | Non-EU controllers within Art. 3(2) generally need an EU representative (Art. 27). Fines up to EUR 20 million or 4 percent of worldwide turnover | K |
+| CCPA thresholds | Applies where annual gross revenue exceeds USD 26,625,000 (inflation adjusted) or the business handles personal information of 100,000 or more California residents or households or earns 50 percent or more of revenue from selling or sharing personal information | V |
+| CCPA 2026 changes | From 1 Jan 2026: visible opt-out confirmation. Global Privacy Control honoured. Risk assessments for significant-risk processing. ADMT rules from 1 Jan 2027. Cybersecurity audits phased 2028 to 2030 | V |
+
+## 8. Terms of service (Check 10)
+
+Use clickwrap (an I agree action next to a link to the terms) and log the timestamp and terms version. Browsewrap with only a footer link is weak. Limitation of liability and arbitration clauses must be conspicuous. US enforceability turns on reasonable notice of the terms and clear assent. In Specht v Netscape (2d Cir 2002) the court refused to enforce an arbitration term that users could only find by scrolling below the download button. One secondary article describes that case as upholding clickwrap. That description looks wrong so confirm the judgment before citing it. Have counsel review. **K**.
+
+## 9. Trademark clearance (owner action)
+
+| Item | Position | Conf. |
+|---|---|---|
+| USPTO base fee | USD 350 per class since the January 2025 fee restructure. Surcharges: USD 200 for free-form identification per class. USD 200 per 1,000 characters over the first 1,000 | V |
+| Filing basis | Section 1(a) use in commerce. Section 1(b) intent to use then Statement of Use at USD 150 per class and extensions at USD 125 per class | V |
+| Clearance steps | Exact match knockout. Phonetic variants. Search the primary class and 2 or 3 related classes. Check common-law use (state registries and domains and social media and app stores). Rate conflicts red or yellow or green | V |
+| Tools | USPTO trademark search. WIPO Global Brand Database. State databases. Professional search USD 500 to 2,000 | V |
+| Common law | An unregistered mark in use in your field and area can block you as effectively as a registration | V |
+
+## 10. Official portals
 
 - https://www.ftc.gov (COPPA, CAN-SPAM, ROSCA)
 - https://www.federalregister.gov (penalty adjustments)

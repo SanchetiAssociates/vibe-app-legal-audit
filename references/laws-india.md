@@ -1,4 +1,4 @@
-# Indian law map for the audit (position as at 2 Oct 2026)
+# Indian law map for the audit (position as at 4 Oct 2026)
 
 Confidence key: **V** = read from a fetched source this session. **K** = established statute known to the author but not re-fetched. Verify every **K** line on the official portal before quoting it to a client. The Gazette text is the only authoritative source.
 
@@ -17,6 +17,8 @@ Confidence key: **V** = read from a fetched source this session. **K** = establi
 | Breach | Intimate affected individuals without delay and report to the Board | V |
 | Rights requests | Respond to access, correction and erasure requests within 90 days | V |
 | Penalty ceilings | Security safeguards failure: Rs 250 crore. Breach non-notification: Rs 200 crore. Children's provisions: Rs 200 crore. Significant Data Fiduciary duties: Rs 150 crore. Data Principal duties: Rs 10,000. Other violations: Rs 50 crore | V |
+
+Rule numbers confirmed on 4 Oct 2026: Rule 3 notice. Rule 4 Consent Managers. Rule 6 security safeguards. Rule 7 breach intimation. Rule 8 erasure and log retention. Rule 10 children. Rule 12 children exemptions (Fourth Schedule). Rule 13 Significant Data Fiduciaries. Rule 14 rights and grievance. Rule 15 cross-border transfer. Full duty-by-duty table: see `dpdp-obligations.md`.
 
 Audit implications:
 - Check 1 (age gate): India sets the threshold at 18 and not 13. A US-style neutral gate must block or route under-18 users to verifiable parental consent from 14 May 2027.
@@ -69,9 +71,31 @@ Audit implications: a US DMCA page is helpful but not enough for Indian users. A
 - IT Act 2000 ss.43 and 66 (unauthorised access and computer-related offences). DPDP s.44(2) is meant to omit s.43A. Check the commencement notification for s.44. **K**
 - Cross-border transfer under DPDP s.16: allowed except to countries the Government restricts by notification. Relevant to fonts and analytics sent to US servers. **K**
 - No Indian court decision equivalent to the Munich Google Fonts ruling was found. An IP address can be personal data under DPDP where the person is identifiable in relation to it. This is the author's reading and needs professional confirmation. **K**
-- GST: invoices for subscriptions must carry the correct HSN or SAC code and GSTIN. This sits outside the six checks but matters for any checkout.
+- GST: invoices for subscriptions must carry the correct HSN or SAC code and GSTIN. This sits outside the scanner checks but matters for any checkout.
 
-## F. Official portals
+## F. Terms of service and clickwrap (Check 10)
+
+| Item | Position | Conf. |
+|---|---|---|
+| Statutes | Indian Contract Act 1872 (free and informed consent). IT Act 2000 s.10A (contracts formed electronically are valid). Indian Evidence Act 1872 s.65B (electronic records) | V |
+| Clickwrap | Highly enforceable when terms are reachable at the click and the I agree action is clearly linked and the system logs identity and timestamp and device. Give conspicuous notice of auto-renewal and jurisdiction | V |
+| Browsewrap | Footer-only links carry high risk with consumers. Courts may find no consensus ad idem | V |
+| Unfair terms | No general unfair-contract statute but the Consumer Protection Act 2019 lets forums set aside unfair contract terms in consumer deals. Courts apply unconscionability to standard forms (Central Inland Water Transport Corporation v Brojo Nath Ganguly 1986) | V |
+| Drafting | Limit unilateral variation to non-material changes. Use layered liability caps. Do not exclude liability for wilful misconduct. Arbitration and jurisdiction clauses need clear written consent and should not be one-sided | V |
+
+Audit implication: every sign-up needs an unticked I agree checkbox or an equivalent affirmative step next to links to the Terms and Privacy Policy. Store acceptance with a timestamp and the terms version.
+
+## G. Trademark clearance (owner action)
+
+| Item | Position | Conf. |
+|---|---|---|
+| Statute | Trade Marks Act 1999. Registered marks get statutory infringement remedies. Unregistered marks are protected through passing off | K |
+| Search tool | IP India public search at ipindiaonline.gov.in is free. Modes: wordmark and phonetic and Vienna code and applicant name | V |
+| Classes for apps | Search Class 9 (software) and Class 35 (business services) and Class 42 (technology services) | V |
+| Reading results | Registered and Advertised before Acceptance are high risk. Objected needs monitoring. Abandoned or Expired are lower risk but check for refiling | V |
+| Action | Run phonetic and wordmark searches before naming. File in the classes you use. Also check domain and app stores and company names at mca.gov.in | V for search steps. K for filing advice |
+
+## H. Official portals
 
 - https://www.meity.gov.in (DPDP Act and Rules)
 - https://doca.gov.in/ccpa/guidelins.php (CCPA guidelines)
